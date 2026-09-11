@@ -1,0 +1,42 @@
+name: Build and Push Images
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PACKAGE_VERSION: test
+  GOPROXY: "https://proxy.golang.org,direct"
+  GOSUMDB: "off"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build linux binaries natively (amd64 runner, no emulation)
+        run: |
+          go build -buildvcs=false -o ./agent/agent ./agent/
+          go build -buildvcs=false -o ./build-index/build-index ./build-index/
+          go build -buildvcs=false -o ./origin/origin ./origin/
+          go build -buildvcs=false -o ./proxy/proxy ./proxy/
+          go build -buildvcs=false -o ./tools/bin/testfs/testfs ./tools/bin/testfs/
+          go build -buildvcs=false -o ./tracker/tracker ./tracker/
+
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and push images
+        run: |
+          for c in agent build-index origin proxy testfs tracker herd; do
+            docker build -t ghcr.io/${{ github.repository_owner }}/kraken-$c:${PACKAGE_VERSION} -f docker/$c/Dockerfile ./
+            docker push ghcr.io/${{ github.repository_owner }}/kraken-$c:${PACKAGE_VERSION}
+          done
