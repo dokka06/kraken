@@ -17,6 +17,7 @@ RUN apt-get clean \
      unset http_proxy https_proxy no_proxy && \
      apt-get install -y --no-install-recommends --fix-missing --allow-unauthenticated \
        curl \
+       ca-certificates \
        nginx \
    ) \
  && rm -rf /var/lib/apt/lists/*

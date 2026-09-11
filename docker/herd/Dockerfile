@@ -21,6 +21,7 @@ RUN apt-get clean \
      apt-get install -y --no-install-recommends --fix-missing --allow-unauthenticated \
        build-essential \
        curl \
+       ca-certificates \
        sqlite3 \
        nginx \
        sudo \

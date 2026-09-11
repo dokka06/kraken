@@ -2,3 +2,6 @@ extends: /etc/kraken/config/agent/base.yaml
 {{ include "tls" . }}
 {{ include "trackers" . }}
 {{ include "build-index" . }}
+
+allowed_cidrs:
+  - 0.0.0.0/0
