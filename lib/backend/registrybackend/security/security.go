@@ -134,7 +134,7 @@ func (a *authenticator) transport(repo string) (http.RoundTripper, error) {
 		Scopes: []auth.Scope{
 			auth.RepositoryScope{
 				Repository: repo,
-				Actions:    []string{"pull", "push"},
+				Actions:    []string{"pull"},
 			},
 		},
 		ClientID: "docker",
